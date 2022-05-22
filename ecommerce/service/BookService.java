@@ -28,14 +28,18 @@ public class BookService {
 		return repository.findByUserId(entity.getUserId());//모든 제품 리스트 
 	}
 	
-	public List<BookEntity> retrieve(final String title){//title 값으로 제품 검색
+	public BookEntity retrieve(final String title){//title 값으로 제품 검색
 		return repository.findByTitle(title);//검색된 제품 리스트
 		
 	}
 	
+	public List<BookEntity> showAllBooks(){
+		return repository.findAll();
+	}
+	
 	public List<BookEntity> update(final BookEntity entity){
 		validate(entity);
-		final Optional<BookEntity> original=repository.findById(entity.getId());
+		final Optional<BookEntity> original=Optional.of(repository.findByTitle(entity.getTitle()));
 		original.ifPresent(book -> {
 			book.setTitle(entity.getTitle());
 			book.setAuthor(entity.getAuthor());
@@ -43,12 +47,12 @@ public class BookService {
 			
 			repository.save(book);
 		});
-		return retrieve(entity.getTitle());//수정된 제품 정보
+		return repository.findByUserId(entity.getUserId());//수정된 제품 정보
 	}
 	
-	public List<BookEntity> delete(final BookEntity entity){
+	public List<BookEntity> delete(final String title){
+		BookEntity entity=repository.findByTitle(title);
 		validate(entity);
-		
 		try {
 			repository.delete(entity);
 		}catch(Exception e) {

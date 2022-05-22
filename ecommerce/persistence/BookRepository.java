@@ -10,5 +10,5 @@ import com.ecommerce.ecommerce.model.BookEntity;
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity,String>{
 	List<BookEntity> findByUserId(String userId);
-	List<BookEntity> findByTitle(String title);
+	BookEntity findByTitle(String title);
 }

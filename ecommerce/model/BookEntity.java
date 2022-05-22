@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name="Book")
 public class BookEntity {
+	
 	@Id
 	@GeneratedValue(generator="system-uuid")
 	@GenericGenerator(name="system-uuid",strategy="uuid")
@@ -27,6 +28,5 @@ public class BookEntity {
 	private String title;
 	private String author;
 	private String publisher;
-	
 	
 }

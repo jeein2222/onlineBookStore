@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,16 @@ public class BookController {
 	@Autowired
 	private BookService service;
 	
-	@PostMapping
+	@GetMapping
+	public ResponseEntity<?> showAllBooks(){
+		List<BookEntity> entities=service.showAllBooks();
+		List<BookDTO> dtos=entities.stream().map(BookDTO::new).collect(Collectors.toList());
+		
+		ResponseDTO<BookDTO> response=ResponseDTO.<BookDTO>builder().data(dtos).build();
+		return ResponseEntity.ok().body(response);
+	}
+	
+	@PostMapping("/create")
 	public ResponseEntity<?> createBook(@RequestBody BookDTO dto){//생성
 		try {
 //			String temporaryUserId="temporary-user";
@@ -44,17 +54,20 @@ public class BookController {
 			String error=e.getMessage();
 			ResponseDTO<BookDTO> response=ResponseDTO.<BookDTO>builder().error(error).build();
 			return ResponseEntity.badRequest().body(response);
+			
 		}
 	}
 	
-	@GetMapping
+	@PostMapping("/retrieve")
 	public ResponseEntity<?> retrieveBookList(@RequestBody BookDTO dto){//검색
 		
 		BookEntity entity=BookDTO.toEntity(dto);
 		String title=entity.getTitle();
 		
-		List<BookEntity> entities=service.retrieve(title);
-		List<BookDTO> dtos=entities.stream().map(BookDTO::new).collect(Collectors.toList());
+		BookEntity searchedEntity=service.retrieve(title);
+		List<BookEntity> searchedEntities=new ArrayList<>();
+		searchedEntities.add(searchedEntity);
+		List<BookDTO> dtos=searchedEntities.stream().map(BookDTO::new).collect(Collectors.toList());
 		
 		ResponseDTO<BookDTO> response=ResponseDTO.<BookDTO>builder().data(dtos).build();
 		return ResponseEntity.ok().body(response);
@@ -63,7 +76,6 @@ public class BookController {
 	
 	@PutMapping
 	public ResponseEntity<?> updateBook(@RequestBody BookDTO dto){ //수정
-//		String temporaryUserId="temporary-user";
 		
 		BookEntity entity=BookDTO.toEntity(dto);
 		entity.setUserId(dto.getUserId());
@@ -81,9 +93,9 @@ public class BookController {
 		try {
 //			String temporaryUserId="temporary-user";
 			BookEntity entity=BookDTO.toEntity(dto);
-			entity.setUserId(dto.getUserId());
+			String title=entity.getTitle();
 			
-			List<BookEntity> entities=service.delete(entity);
+			List<BookEntity> entities=service.delete(title);
 			List<BookDTO> dtos=entities.stream().map(BookDTO::new).collect(Collectors.toList());
 			
 			ResponseDTO<BookDTO> response=ResponseDTO.<BookDTO>builder().data(dtos).build();
@@ -92,7 +104,6 @@ public class BookController {
 			String error=e.getMessage();
 			ResponseDTO<BookDTO> response=ResponseDTO.<BookDTO>builder().error(error).build();
 			return ResponseEntity.badRequest().body(response);
-			
 		}
 	}
 
